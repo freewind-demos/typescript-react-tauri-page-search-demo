@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Button, Card, Col, Input, Layout, Row, Space, Tag, Typography } from "antd";
-import type { InputRef } from "antd";
+import { Alert, Card, Col, Layout, Row, Space, Tag, Typography } from "antd";
 import "./App.css";
+import { PageSearch } from "./PageSearch";
 
 const { Content, Header } = Layout;
 const { Paragraph, Text, Title } = Typography;
@@ -16,239 +15,46 @@ const articleParagraphs = [
   "最后一段描述后续规划：下一步可以把搜索词与系统菜单联动，或增加 ESC 关闭搜索框、Enter 跳转下一条、Shift Enter 跳转上一条 等交互。当前版本先把基础体验做稳定。 ",
 ];
 
-type MatchRange = {
-  end: number;
-  start: number;
-};
-
-const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-const getAllMatchRanges = (text: string, keyword: string): MatchRange[] => {
-  if (!keyword) {
-    return [];
-  }
-
-  const ranges: MatchRange[] = [];
-  const pattern = new RegExp(escapeRegExp(keyword), "gi");
-
-  for (const match of text.matchAll(pattern)) {
-    const start = match.index;
-
-    if (start === undefined) {
-      continue;
-    }
-
-    ranges.push({
-      start,
-      end: start + match[0].length,
-    });
-  }
-
-  return ranges;
-};
-
-const renderHighlightedText = (text: string, keyword: string, activeMatchIndex: number, matchOffset: number) => {
-  const ranges = getAllMatchRanges(text, keyword);
-
-  if (ranges.length === 0) {
-    return text;
-  }
-
-  const nodes: Array<React.ReactNode> = [];
-  let cursor = 0;
-
-  ranges.forEach((range, index) => {
-    if (cursor < range.start) {
-      nodes.push(text.slice(cursor, range.start));
-    }
-
-    const isActive = matchOffset + index === activeMatchIndex;
-
-    nodes.push(
-      <mark
-        className={isActive ? "search-mark search-mark-active" : "search-mark"}
-        data-active={isActive}
-        key={`${range.start}-${range.end}`}
-      >
-        {text.slice(range.start, range.end)}
-      </mark>,
-    );
-
-    cursor = range.end;
-  });
-
-  if (cursor < text.length) {
-    nodes.push(text.slice(cursor));
-  }
-
-  return nodes;
-};
-
 const App = () => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [keywordDraft, setKeywordDraft] = useState("");
-  const [keyword, setKeyword] = useState("");
-  const [activeMatchIndex, setActiveMatchIndex] = useState(0);
-  const searchInputRef = useRef<InputRef | null>(null);
-
-  const matchCount = useMemo(
-    () => articleParagraphs.reduce((total, paragraph) => total + getAllMatchRanges(paragraph, keyword).length, 0),
-    [keyword],
-  );
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "f") {
-        event.preventDefault();
-        setIsSearchOpen(true);
-
-        requestAnimationFrame(() => {
-          searchInputRef.current?.focus({
-            cursor: "all",
-          });
-        });
-      }
-
-      if (event.key === "Escape") {
-        setIsSearchOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (matchCount === 0) {
-      setActiveMatchIndex(0);
-      return;
-    }
-
-    setActiveMatchIndex((current) => {
-      if (current >= matchCount) {
-        return 0;
-      }
-
-      return current;
-    });
-  }, [matchCount]);
-
-  useEffect(() => {
-    if (!keyword || matchCount === 0) {
-      return;
-    }
-
-    const activeMark = document.querySelector<HTMLElement>('mark[data-active="true"]');
-    activeMark?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
-  }, [activeMatchIndex, keyword, matchCount]);
-
-  const applySearch = (nextKeyword: string) => {
-    setKeyword(nextKeyword.trim());
-    setActiveMatchIndex(0);
-  };
-
-  const jumpToMatch = (direction: 1 | -1) => {
-    if (matchCount === 0) {
-      return;
-    }
-
-    setActiveMatchIndex((current) => (current + direction + matchCount) % matchCount);
-  };
-
-  let matchOffset = 0;
-
   return (
-    <Layout className="page-layout">
-      <Header className="page-header">
-        <div>
-          <Title className="page-title" level={3}>
-            Tauri 页内搜索 Demo
-          </Title>
-          <Text className="page-subtitle">按 Command/Ctrl + F 打开自定义搜索框。</Text>
-        </div>
-        <Space>
-          <Tag color="blue">Tauri</Tag>
-          <Tag color="geekblue">React</Tag>
-          <Tag color="purple">TypeScript</Tag>
-        </Space>
-      </Header>
-      <Content className="page-content">
-        {isSearchOpen ? (
-          <Card className="search-card" size="small">
-            <Space direction="vertical" size="small" style={{ width: "100%" }}>
-              <Row gutter={12} wrap={false}>
-                <Col flex="auto">
-                  <Input
-                    allowClear
-                    onChange={(event) => {
-                      const nextKeyword = event.target.value;
-                      setKeywordDraft(nextKeyword);
-                      applySearch(nextKeyword);
-                    }}
-                    onPressEnter={() => {
-                      if (keyword) {
-                        jumpToMatch(1);
-                      }
-                    }}
-                    placeholder="搜索页面文字，例如：搜索 / 快捷键 / 同步"
-                    ref={searchInputRef}
-                    value={keywordDraft}
-                  />
-                </Col>
-                <Col>
-                  <Space>
-                    <Button onClick={() => jumpToMatch(-1)}>上一条</Button>
-                    <Button onClick={() => setIsSearchOpen(false)}>关闭</Button>
-                    <Button onClick={() => jumpToMatch(1)} type="primary">
-                      下一条
-                    </Button>
-                  </Space>
-                </Col>
-              </Row>
-              <Space>
-                <Text type={matchCount === 0 && keyword ? "danger" : undefined}>
-                  {keyword ? `结果 ${matchCount === 0 ? "0" : `${activeMatchIndex + 1} / ${matchCount}`}` : "输入关键词后立即搜索；按 Enter 跳到下一条。"}
-                </Text>
-                {keyword ? <Tag>{`关键词：${keyword}`}</Tag> : null}
-              </Space>
-            </Space>
-          </Card>
-        ) : null}
-
-        <Row gutter={[24, 24]}>
-          <Col span={24}>
-            <Alert
-              message="交互说明"
-              description="按 Command/Ctrl + F 打开搜索框。输入时立即高亮命中；按 Enter 跳到下一条结果。"
-              showIcon
-              type="info"
-            />
-          </Col>
-          <Col span={24}>
-            <Card title="演示文档" bordered>
-              <Space className="article-space" direction="vertical" size="middle">
-                {articleParagraphs.map((paragraph, index) => {
-                  const currentOffset = matchOffset;
-                  matchOffset += getAllMatchRanges(paragraph, keyword).length;
-
-                  return (
-                    <Paragraph key={paragraph.slice(0, 16) + index}>
-                      {renderHighlightedText(paragraph, keyword, activeMatchIndex, currentOffset)}
-                    </Paragraph>
-                  );
-                })}
-              </Space>
-            </Card>
-          </Col>
-        </Row>
-      </Content>
-    </Layout>
+    <PageSearch>
+      <Layout className="page-layout">
+        <Header className="page-header">
+          <div>
+            <Title className="page-title" level={3}>
+              Tauri 页内搜索 Demo
+            </Title>
+            <Text className="page-subtitle">按 Command/Ctrl + F 打开自定义搜索框。</Text>
+          </div>
+          <Space>
+            <Tag color="blue">Tauri</Tag>
+            <Tag color="geekblue">React</Tag>
+            <Tag color="purple">TypeScript</Tag>
+          </Space>
+        </Header>
+        <Content className="page-content">
+          <Row gutter={[24, 24]}>
+            <Col span={24}>
+              <Alert
+                message="交互说明"
+                description="搜索组件不依赖具体文案结构，直接扫描当前页面 DOM 文本节点。"
+                showIcon
+                type="info"
+              />
+            </Col>
+            <Col span={24}>
+              <Card title="演示文档" bordered>
+                <Space className="article-space" direction="vertical" size="middle">
+                  {articleParagraphs.map((paragraph, index) => (
+                    <Paragraph key={paragraph.slice(0, 16) + index}>{paragraph}</Paragraph>
+                  ))}
+                </Space>
+              </Card>
+            </Col>
+          </Row>
+        </Content>
+      </Layout>
+    </PageSearch>
   );
 };
 
