@@ -1,6 +1,7 @@
 import type {FC, ReactNode} from "react";
 import {useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 import "./PageSearch.css";
+import {styles} from './styles';
 
 type MatchRange = {
     end: number;
@@ -22,87 +23,6 @@ const SEARCH_MARK_ATTR = "data-page-search-mark";
 const SEARCH_MATCH_ID_ATTR = "data-page-search-match-id";
 const SEARCH_UI_ATTR = "data-page-search-ui";
 
-const searchCardStyle = {
-    position: "fixed",
-    top: 14,
-    right: 24,
-    zIndex: 1000,
-    width: 280,
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "5px 8px",
-    background: "#ffffff",
-    border: "1px solid #d9d9d9",
-    borderRadius: "0 0 8px 8px",
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.14)",
-} as const;
-
-const searchInputWrapStyle = {
-    position: "relative",
-    flex: 1,
-    minWidth: 0,
-} as const;
-
-const searchInputStyle = {
-    width: "100%",
-    height: 26,
-    padding: "2px 42px 2px 8px",
-    color: "#1f1f1f",
-    fontSize: 12,
-    lineHeight: "20px",
-    background: "#ffffff",
-    border: "1px solid #d9d9d9",
-    borderRadius: 6,
-    outline: "none",
-} as const;
-
-const searchCountStyle = {
-    position: "absolute",
-    top: "50%",
-    right: 8,
-    minWidth: 34,
-    fontSize: 12,
-    color: "#595959",
-    textAlign: "right",
-    transform: "translateY(-50%)",
-    pointerEvents: "none",
-} as const;
-
-const searchActionsStyle = {
-    display: "flex",
-    alignItems: "center",
-    gap: 2,
-    flexShrink: 0,
-} as const;
-
-const searchArrowButtonStyle = {
-    width: 24,
-    minWidth: 24,
-    height: 26,
-    padding: 0,
-    color: "#595959",
-    fontSize: 18,
-    lineHeight: "24px",
-    background: "transparent",
-    border: "1px solid transparent",
-    borderRadius: 4,
-    cursor: "pointer",
-} as const;
-
-const searchCloseButtonStyle = {
-    width: 24,
-    minWidth: 24,
-    height: 26,
-    padding: 0,
-    color: "#595959",
-    fontSize: 12,
-    lineHeight: "24px",
-    background: "transparent",
-    border: "1px solid transparent",
-    borderRadius: 4,
-    cursor: "pointer",
-} as const;
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -370,8 +290,8 @@ export const PageSearch: FC<PageSearchProps> = ({children}) => {
     return (
         <>
             {isSearchOpen ? (
-                <div data-page-search-ui="true" style={searchCardStyle}>
-                    <div style={searchInputWrapStyle}>
+                <div data-page-search-ui="true" style={styles.searchCardStyle}>
+                    <div style={styles.searchInputWrapStyle}>
                         <input
                             autoComplete="off"
                             onChange={(event) => {
@@ -386,26 +306,26 @@ export const PageSearch: FC<PageSearchProps> = ({children}) => {
                                 }
                             }}
                             ref={searchInputRef}
-                            style={searchInputStyle}
+                            style={styles.searchInputStyle}
                             type="text"
                             value={keywordDraft}
                         />
                         <span
                             style={{
-                                ...searchCountStyle,
-                                color: matchCount === 0 && normalizedKeyword ? "#ff4d4f" : searchCountStyle.color,
+                                ...styles.searchCountStyle,
+                                color: matchCount === 0 && normalizedKeyword ? "#ff4d4f" : styles.searchCountStyle.color,
                             }}
                         >
                             {searchCountLabel}
                         </span>
                     </div>
-                    <div style={searchActionsStyle}>
+                    <div style={styles.searchActionsStyle}>
                         <button
                             disabled={matchCount === 0}
                             onClick={() => jumpToMatch(-1)}
                             style={{
-                                ...searchArrowButtonStyle,
-                                color: matchCount === 0 ? "#bfbfbf" : searchArrowButtonStyle.color,
+                                ...styles.searchArrowButtonStyle,
+                                color: matchCount === 0 ? "#bfbfbf" : styles.searchArrowButtonStyle.color,
                             }}
                             type="button"
                         >
@@ -415,8 +335,8 @@ export const PageSearch: FC<PageSearchProps> = ({children}) => {
                             disabled={matchCount === 0}
                             onClick={() => jumpToMatch(1)}
                             style={{
-                                ...searchArrowButtonStyle,
-                                color: matchCount === 0 ? "#bfbfbf" : searchArrowButtonStyle.color,
+                                ...styles.searchArrowButtonStyle,
+                                color: matchCount === 0 ? "#bfbfbf" : styles.searchArrowButtonStyle.color,
                             }}
                             type="button"
                         >
@@ -424,7 +344,7 @@ export const PageSearch: FC<PageSearchProps> = ({children}) => {
                         </button>
                         <button
                             onClick={closeSearch}
-                            style={searchCloseButtonStyle}
+                            style={styles.searchCloseButtonStyle}
                             type="button"
                         >
                             ✕
