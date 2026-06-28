@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Button, Card, Col, Input, Row, Space, Tag, Typography } from "antd";
+import { Button, Input, Space, Typography } from "antd";
 import type { FC, ReactNode } from "react";
 import type { InputRef } from "antd";
 
@@ -287,57 +287,60 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
   return (
     <>
       {isSearchOpen ? (
-        <Card className="search-card" data-page-search-ui="true" size="small">
-          <Space direction="vertical" size="small" style={{ width: "100%" }}>
-            <Row gutter={12} wrap={false}>
-              <Col flex="auto">
-                <Input
-                  allowClear
-                  onChange={(event) => {
-                    const nextKeyword = event.target.value;
-                    setKeywordDraft(nextKeyword);
-                    setKeyword(nextKeyword);
-                    setActiveMatchIndex(0);
-                  }}
-                  onPressEnter={(event) => {
-                    jumpToMatch(event.shiftKey ? -1 : 1);
-                  }}
-                  placeholder="搜索当前页面任意可见文字"
-                  ref={searchInputRef}
-                  value={keywordDraft}
-                />
-              </Col>
-              <Col>
-                <Space>
-                  <Button disabled={matchCount === 0} onClick={() => jumpToMatch(-1)}>
-                    上一条
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setIsSearchOpen(false);
-                      setKeyword("");
-                      setKeywordDraft("");
-                      setActiveMatchIndex(0);
-                    }}
-                  >
-                    关闭
-                  </Button>
-                  <Button disabled={matchCount === 0} onClick={() => jumpToMatch(1)} type="primary">
-                    下一条
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-            <Space>
-              <Text type={matchCount === 0 && normalizedKeyword ? "danger" : undefined}>
-                {normalizedKeyword
-                  ? `结果 ${matchCount === 0 ? "0" : `${activeMatchIndex + 1} / ${matchCount}`}`
-                  : "输入后立即搜索；Enter 下一条；Shift Enter 上一条。"}
-              </Text>
-              {normalizedKeyword ? <Tag>{`关键词：${normalizedKeyword}`}</Tag> : null}
-            </Space>
+        <div className="search-card search-card-compact" data-page-search-ui="true">
+          <Input
+            allowClear
+            autoComplete="off"
+            className="search-input"
+            onChange={(event) => {
+              const nextKeyword = event.target.value;
+              setKeywordDraft(nextKeyword);
+              setKeyword(nextKeyword);
+              setActiveMatchIndex(0);
+            }}
+            onPressEnter={(event) => {
+              jumpToMatch(event.shiftKey ? -1 : 1);
+            }}
+            ref={searchInputRef}
+            value={keywordDraft}
+          />
+          <Text className="search-count" type={matchCount === 0 && normalizedKeyword ? "danger" : undefined}>
+            {normalizedKeyword ? (matchCount === 0 ? "0/0" : `${activeMatchIndex + 1}/${matchCount}`) : ""}
+          </Text>
+          <Space className="search-actions" size={4}>
+            <Button
+              className="search-action-button"
+              disabled={matchCount === 0}
+              onClick={() => jumpToMatch(-1)}
+              size="small"
+              type="text"
+            >
+              ˄
+            </Button>
+            <Button
+              className="search-action-button"
+              disabled={matchCount === 0}
+              onClick={() => jumpToMatch(1)}
+              size="small"
+              type="text"
+            >
+              ˅
+            </Button>
+            <Button
+              className="search-action-button"
+              onClick={() => {
+                setIsSearchOpen(false);
+                setKeyword("");
+                setKeywordDraft("");
+                setActiveMatchIndex(0);
+              }}
+              size="small"
+              type="text"
+            >
+              ✕
+            </Button>
           </Space>
-        </Card>
+        </div>
       ) : null}
       <div ref={contentRef}>{children}</div>
     </>
