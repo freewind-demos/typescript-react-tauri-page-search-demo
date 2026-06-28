@@ -27,7 +27,7 @@ const searchCardStyle = {
     top: 14,
     right: 24,
     zIndex: 1000,
-    width: 352,
+    width: 280,
     display: "flex",
     alignItems: "center",
     gap: 6,
