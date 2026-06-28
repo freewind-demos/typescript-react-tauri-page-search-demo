@@ -43,15 +43,3 @@ body {
 .article-space {
   width: 100%;
 }
-
-@media (max-width: 768px) {
-  .page-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 16px;
-  }
-
-  .page-content {
-    padding: 16px 16px 32px;
-  }
-}
