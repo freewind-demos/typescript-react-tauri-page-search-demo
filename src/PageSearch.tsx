@@ -315,7 +315,7 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
               size="small"
               type="text"
             >
-              ˄
+              上一个
             </Button>
             <Button
               className="search-action-button"
@@ -324,10 +324,10 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
               size="small"
               type="text"
             >
-              ˅
+              下一个
             </Button>
             <Button
-              className="search-action-button"
+              className="search-close-button"
               onClick={() => {
                 setIsSearchOpen(false);
                 setKeyword("");
