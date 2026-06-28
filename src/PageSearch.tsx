@@ -1,9 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Button, Input, Space, Typography } from "antd";
 import type { FC, ReactNode } from "react";
-import type { InputRef } from "antd";
-
-const { Text } = Typography;
+import "./PageSearch.css";
 
 type MatchRange = {
   end: number;
@@ -200,7 +197,7 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
   const [keyword, setKeyword] = useState("");
   const [activeMatchIndex, setActiveMatchIndex] = useState(0);
   const [matchCount, setMatchCount] = useState(0);
-  const searchInputRef = useRef<InputRef | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   const normalizedKeyword = useMemo(() => keyword.trim(), [keyword]);
@@ -212,9 +209,8 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
         setIsSearchOpen(true);
 
         requestAnimationFrame(() => {
-          searchInputRef.current?.focus({
-            cursor: "all",
-          });
+          searchInputRef.current?.focus();
+          searchInputRef.current?.select();
         });
       }
 
@@ -288,8 +284,7 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
     <>
       {isSearchOpen ? (
         <div className="search-card search-card-compact" data-page-search-ui="true">
-          <Input
-            allowClear
+          <input
             autoComplete="off"
             className="search-input"
             onChange={(event) => {
@@ -298,35 +293,36 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
               setKeyword(nextKeyword);
               setActiveMatchIndex(0);
             }}
-            onPressEnter={(event) => {
-              jumpToMatch(event.shiftKey ? -1 : 1);
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                jumpToMatch(event.shiftKey ? -1 : 1);
+              }
             }}
             ref={searchInputRef}
+            type="text"
             value={keywordDraft}
           />
-          <Text className="search-count" type={matchCount === 0 && normalizedKeyword ? "danger" : undefined}>
+          <span className={`search-count ${matchCount === 0 && normalizedKeyword ? "search-count-danger" : ""}`}>
             {normalizedKeyword ? (matchCount === 0 ? "0/0" : `${activeMatchIndex + 1}/${matchCount}`) : ""}
-          </Text>
-          <Space className="search-actions" size={4}>
-            <Button
+          </span>
+          <div className="search-actions">
+            <button
               className="search-action-button"
               disabled={matchCount === 0}
               onClick={() => jumpToMatch(-1)}
-              size="small"
-              type="text"
+              type="button"
             >
               上一个
-            </Button>
-            <Button
+            </button>
+            <button
               className="search-action-button"
               disabled={matchCount === 0}
               onClick={() => jumpToMatch(1)}
-              size="small"
-              type="text"
+              type="button"
             >
               下一个
-            </Button>
-            <Button
+            </button>
+            <button
               className="search-close-button"
               onClick={() => {
                 setIsSearchOpen(false);
@@ -334,12 +330,11 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
                 setKeywordDraft("");
                 setActiveMatchIndex(0);
               }}
-              size="small"
-              type="text"
+              type="button"
             >
               ✕
-            </Button>
-          </Space>
+            </button>
+          </div>
         </div>
       ) : null}
       <div ref={contentRef}>{children}</div>
