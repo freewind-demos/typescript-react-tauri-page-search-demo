@@ -187,15 +187,14 @@ const App = () => {
                   <Input
                     allowClear
                     onChange={(event) => {
-                      setKeywordDraft(event.target.value);
+                      const nextKeyword = event.target.value;
+                      setKeywordDraft(nextKeyword);
+                      applySearch(nextKeyword);
                     }}
                     onPressEnter={() => {
-                      if (keywordDraft.trim() === keyword && keyword) {
+                      if (keyword) {
                         jumpToMatch(1);
-                        return;
                       }
-
-                      applySearch(keywordDraft);
                     }}
                     placeholder="搜索页面文字，例如：搜索 / 快捷键 / 同步"
                     ref={searchInputRef}
@@ -207,15 +206,15 @@ const App = () => {
                     <Button onClick={() => jumpToMatch(-1)}>上一条</Button>
                     <Button onClick={() => jumpToMatch(1)}>下一条</Button>
                     <Button onClick={() => setIsSearchOpen(false)}>关闭</Button>
-                    <Button onClick={() => applySearch(keywordDraft)} type="primary">
-                      搜索
+                    <Button onClick={() => jumpToMatch(1)} type="primary">
+                      下一条
                     </Button>
                   </Space>
                 </Col>
               </Row>
               <Space>
                 <Text type={matchCount === 0 && keyword ? "danger" : undefined}>
-                  {keyword ? `结果 ${matchCount === 0 ? "0" : `${activeMatchIndex + 1} / ${matchCount}`}` : "输入关键词后按 Enter 或点击搜索。"}
+                  {keyword ? `结果 ${matchCount === 0 ? "0" : `${activeMatchIndex + 1} / ${matchCount}`}` : "输入关键词后立即搜索；按 Enter 跳到下一条。"}
                 </Text>
                 {keyword ? <Tag>{`关键词：${keyword}`}</Tag> : null}
               </Space>
@@ -227,7 +226,7 @@ const App = () => {
           <Col span={24}>
             <Alert
               message="交互说明"
-              description="按 Command/Ctrl + F 打开搜索框。输入关键词后回车即可搜索；再次回车跳到下一条结果。"
+              description="按 Command/Ctrl + F 打开搜索框。输入时立即高亮命中；按 Enter 跳到下一条结果。"
               showIcon
               type="info"
             />
