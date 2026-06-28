@@ -204,7 +204,6 @@ const App = () => {
                 <Col>
                   <Space>
                     <Button onClick={() => jumpToMatch(-1)}>上一条</Button>
-                    <Button onClick={() => jumpToMatch(1)}>下一条</Button>
                     <Button onClick={() => setIsSearchOpen(false)}>关闭</Button>
                     <Button onClick={() => jumpToMatch(1)} type="primary">
                       下一条
