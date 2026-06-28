@@ -284,37 +284,35 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
     <>
       {isSearchOpen ? (
         <div className="search-card search-card-compact" data-page-search-ui="true">
-          <div className="search-main">
-            <div className="search-input-shell">
-              <input
-                autoComplete="off"
-                className="search-input"
-                onChange={(event) => {
-                  const nextKeyword = event.target.value;
-                  setKeywordDraft(nextKeyword);
-                  setKeyword(nextKeyword);
-                  setActiveMatchIndex(0);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    jumpToMatch(event.shiftKey ? -1 : 1);
-                  }
-                }}
-                ref={searchInputRef}
-                type="text"
-                value={keywordDraft}
-              />
-              <span className={`search-count ${matchCount === 0 && normalizedKeyword ? "search-count-danger" : ""}`}>
-                {normalizedKeyword ? (matchCount === 0 ? "0/0" : `${activeMatchIndex + 1}/${matchCount}`) : ""}
-              </span>
-            </div>
+          <input
+            autoComplete="off"
+            className="search-input"
+            onChange={(event) => {
+              const nextKeyword = event.target.value;
+              setKeywordDraft(nextKeyword);
+              setKeyword(nextKeyword);
+              setActiveMatchIndex(0);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                jumpToMatch(event.shiftKey ? -1 : 1);
+              }
+            }}
+            ref={searchInputRef}
+            type="text"
+            value={keywordDraft}
+          />
+          <span className={`search-count ${matchCount === 0 && normalizedKeyword ? "search-count-danger" : ""}`}>
+            {normalizedKeyword ? (matchCount === 0 ? "0/0" : `${activeMatchIndex + 1}/${matchCount}`) : ""}
+          </span>
+          <div className="search-actions">
             <button
               className="search-action-button"
               disabled={matchCount === 0}
               onClick={() => jumpToMatch(-1)}
               type="button"
             >
-              ˄
+              上一个
             </button>
             <button
               className="search-action-button"
@@ -322,10 +320,8 @@ export const PageSearch: FC<PageSearchProps> = ({ children }) => {
               onClick={() => jumpToMatch(1)}
               type="button"
             >
-              ˅
+              下一个
             </button>
-          </div>
-          <div className="search-actions">
             <button
               className="search-close-button"
               onClick={() => {
