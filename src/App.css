@@ -41,10 +41,11 @@ body {
 }
 
 .search-card {
-  position: sticky;
-  top: 16px;
-  z-index: 10;
-  margin-bottom: 24px;
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 1000;
+  width: min(560px, calc(100vw - 48px));
   border-radius: 12px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 }
@@ -73,6 +74,13 @@ body {
 
   .page-content {
     padding: 16px 16px 32px;
+  }
+
+  .search-card {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    width: auto;
   }
 
   .search-card .ant-row {
